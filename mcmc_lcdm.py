@@ -62,9 +62,9 @@ if data == 'Pantheon':
     mstar = a_masked['logM']
     e_mstar = a_masked['e_logM']
 elif data == 'JLA':
-    sigma = np.loadtxt('covmat/sigma_mu.txt')
+    sigma = np.loadtxt('data/covmat/sigma_mu.txt')
     #C_eta = sum([fits.getdata(mat) for mat in [g for g in glob('covmat/C*.fits') if 'host' not in g]])
-    C_eta = sum([fits.getdata(mat) for mat in [g for g in glob('covmat/C*.fits')]])
+    C_eta = sum([fits.getdata(mat) for mat in [g for g in glob('data/covmat/C*.fits')]])
     a = fits.getdata('data/JLA.fit')
     mb = a['mB']
     e_mb = a['e_mB']
