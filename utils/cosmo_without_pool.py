@@ -96,6 +96,11 @@ def integr_total(inputs):
     z, om, ol, orad, ok = inputs
     return integrate.quad(integrand_total_in_c, 0, z, args=(om, ol, orad, ok))[0]
     #return integrate.quad(integrand_total, 0, z, args=(om, ol, orad, ok))[0]
+
+def dc(z, om, ol, ok, w):
+    inputs = zip(z, repeat(om), repeat(ol), repeat(ok), repeat(w))
+    ee = map(integr, inputs)
+    return cst.c.to('km/s').value * np.array(list(ee))
     
 def dl(z, om, ol, ok, w):
     inputs = zip(z, repeat(om), repeat(ol), repeat(ok), repeat(w))

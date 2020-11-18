@@ -2,7 +2,7 @@ import emcee
 import numpy as np
 import matplotlib.pyplot as plt
 from corner import corner
-from utils.cosmo_without_pool import tofit
+from utils.cosmo_without_pool import tofit, dc
 from multiprocessing import Pool
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
@@ -27,7 +27,9 @@ def mu_cov(alpha, beta):
 def lnlike(params):
     om, M, dM, alpha, beta = params
     C_mu = mu_cov(alpha, beta)
-    D = mb - M + alpha*x1 - beta*c - tofit(z, om, -1)
+    ol = 1 - om
+    lum_dist = 5*np.log10((1+z_obs)*dc(z, om, ol, ok, w)) - 5
+    D = mb - M + alpha*x1 - beta*c - lum_dist
     D[mstar >= 10] -= dM
     slv = sp.linalg.solve_triangular(np.linalg.cholesky(C_mu), D.T, lower=True)
     res = slv.T @ slv
@@ -48,6 +50,8 @@ def lnprob(params):
 #data = 'Pantheon'
 data = 'JLA'
 #data = 'JLA+A2'
+ok = 0
+w = -1
 
 if data == 'Pantheon':
     a = np.genfromtxt('data/pantheon.txt', names=True, dtype=None)
@@ -70,6 +74,7 @@ elif data == 'JLA':
     mb = a['mB']
     e_mb = a['e_mB']
     z = a['zcmb']
+    z_obs = a['zhel']
     x1 = a['x1']
     e_x1 = a['e_x1']
     c = a['c']
