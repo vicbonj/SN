@@ -5,6 +5,9 @@ from itertools import repeat
 import os, ctypes
 import platform
 
+#os.system('gcc -dynamiclib -o testlib.dylib -lm -fPIC testlib.c')
+#os.system('gcc -shared -o testlib.so -lm -fPIC testlib.c')
+
 if platform.uname()[0] != 'Darwin':
     dir1 = os.path.abspath('testlib.so')
     lib = ctypes.cdll.LoadLibrary(dir1)
@@ -13,6 +16,18 @@ if platform.uname()[0] != 'Darwin':
     integrand_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
     
     dir2 = os.path.abspath('testlib_total.so')
+    lib2 = ctypes.cdll.LoadLibrary(dir2)
+    integrand_total_in_c = lib2.f
+    integrand_total_in_c.restype = ctypes.c_double
+    integrand_total_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
+else:
+    dir1 = os.path.abspath('testlib.dylib')
+    lib = ctypes.cdll.LoadLibrary(dir1)
+    integrand_in_c = lib.f
+    integrand_in_c.restype = ctypes.c_double
+    integrand_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
+
+    dir2 = os.path.abspath('testlib_total.dylib')
     lib2 = ctypes.cdll.LoadLibrary(dir2)
     integrand_total_in_c = lib2.f
     integrand_total_in_c.restype = ctypes.c_double
