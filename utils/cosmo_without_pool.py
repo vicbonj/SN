@@ -46,21 +46,17 @@ def integrand_total(z, om, ol, orad, ok):
     return 1/ez_total(z, om, ol, orad, ok)
 
 def integr(inputs):
-    z, om, ol, ok, w, in_c = inputs
-    if in_c == True:
-        return integrate.quad(integrand_in_c, 0, z, args=(om, ol, ok, w))[0]
-    else:
-        return integrate.quad(integrand, 0, z, args=(om, ol, ok, w))[0]
+    z, om, ol, ok, w = inputs
+    return integrate.quad(integrand_in_c, 0, z, args=(om, ol, ok, w))[0]
+    #return integrate.quad(integrand, 0, z, args=(om, ol, ok, w))[0]
 
 def integr_total(inputs):
-    z, om, ol, orad, ok, in_c = inputs
-    if in_c == True:
-        return integrate.quad(integrand_total_in_c, 0, z, args=(om, ol, orad, ok))[0]
-    else:
-        return integrate.quad(integrand_total, 0, z, args=(om, ol, orad, ok))[0]
+    z, om, ol, orad, ok = inputs
+    return integrate.quad(integrand_total_in_c, 0, z, args=(om, ol, orad, ok))[0]
+    #return integrate.quad(integrand_total, 0, z, args=(om, ol, orad, ok))[0]
     
-def dl(z, om, ol, ok, w, in_c):
-    inputs = zip(z, repeat(om), repeat(ol), repeat(ok), repeat(w), repeat(in_c))
+def dl(z, om, ol, ok, w):
+    inputs = zip(z, repeat(om), repeat(ol), repeat(ok), repeat(w))
     ee = map(integr, inputs)
     return (1+z) * cst.c.to('km/s').value * list(ee)
 
@@ -74,8 +70,8 @@ def dl_total(z, om, ol, orad, ok):
     else:
         return (1+z) * cst.c.to('km/s').value * list(ee)
 
-def mul(z, om, ol, ok, w, in_c):
-    return 5*np.log10(dl(z, om, ol, ok, w, in_c)) - 5
+def mul(z, om, ol, ok, w):
+    return 5*np.log10(dl(z, om, ol, ok, w)) - 5
 
 def mul_total(z, om, ol, orad, ok):
     return 5*np.log10(dl_total(z, om, ol, orad, ok)) - 5
@@ -85,8 +81,7 @@ def tofit_total(z, om, ol):
     ok = 1 - om - ol - orad
     return mul_total(z, om, ol, orad, ok)
 
-def tofit(z, om, w, in_c):
-    #ok = 1 - ol - om
+def tofit(z, om, w):
     ok = 0
     ol = 1 - om
-    return mul(z, om, ol, ok, w, in_c)
+    return mul(z, om, ol, ok, w)

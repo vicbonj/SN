@@ -23,10 +23,10 @@ def mu_cov(alpha, beta):
     C_mu[np.diag_indices_from(C_mu)] += to_add
     return C_mu
 
-def lnlike(params, in_c):
+def lnlike(params):
     om, M, dM, alpha, beta = params
     C_mu = mu_cov(alpha, beta)
-    D = mb - M + alpha*x1 - beta*c - tofit(z, om, -1, in_c)
+    D = mb - M + alpha*x1 - beta*c - tofit(z, om, -1)
     D[mstar >= 10] -= dM
     slv = sp.linalg.solve_triangular(np.linalg.cholesky(C_mu), D.T, lower=True)
     res = slv.T @ slv
@@ -38,11 +38,11 @@ def lnprior(params):
     else:
         return -np.inf
 
-def lnprob(params, in_c):
+def lnprob(params):
     lp = lnprior(params)
     if not np.isfinite(lp):
         return -np.inf
-    return lp + lnlike(params, in_c)
+    return lp + lnlike(params)
 
 #data = 'Pantheon'
 data = 'JLA'
@@ -120,12 +120,8 @@ pos = [pos0 + np.random.randn(ndim)*0.005*pos0 for i in range(nwalkers)]
 
 the_pool = Pool(30)
 
-in_c = True
-if platform.uname()[0] == 'Darwin':
-    in_c = False
+sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, pool=the_pool)
 
-sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, pool=the_pool, args=(in_c, ))
-    
 sampler.run_mcmc(pos, nsteps, progress=True)
 
 the_pool.close()
@@ -138,9 +134,9 @@ corner(samples, labels=labels, plot_datapoints=False, color='C0', title='$\Lambd
 om, M, dM, alpha, beta = np.median(samples, axis=0)
 w = -1
 z_bin = np.linspace(0.01, 1.5, 1000)
-model = tofit(z_bin, om, w, in_c)
-model_eds = tofit(z_bin, 1, -1, in_c)
-model_at_z = tofit(z, om, w, in_c)
+model = tofit(z_bin, om, w)
+model_eds = tofit(z_bin, 1, -1)
+model_at_z = tofit(z, om, w)
 mu = mb + alpha*x1 - beta*c - M
 mu[mstar > 10] -= dM
 e_mu = np.sqrt(e_mb**2 + (abs(alpha)*e_x1)**2 + (abs(beta)*e_c)**2)
