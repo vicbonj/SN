@@ -184,6 +184,7 @@ plt.errorbar(0.5*(bins[:-1] + bins[1:]), bin_means, bin_errors, fmt='.')
 plt.xlabel('$\mathrm{log}_{10} ( {M_\star}_\mathrm{ZPEG} / M_\odot)$', fontsize=15)
 plt.ylabel('$\mu-\mu_\mathrm{\Lambda CDM}$', fontsize=15)
 
+'''
 bb = pd.read_csv('ml_res.csv')
 
 mask = a['zhel'] < 0.3
@@ -221,3 +222,4 @@ plt.ylabel('$\mu-\mu_\mathrm{\Lambda CDM}$', fontsize=15)
 #mask_f = (z_aft > 0.1) & (z_aft < 0.2)
 mask_f = (z_aft > 0.1) & (z_aft < 0.3)
 p, p0 = curve_fit(lin, np.log10(ssfr)[mask_f], (mu_aft - model_aft)[mask_f])
+'''
