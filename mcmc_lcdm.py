@@ -2,7 +2,7 @@ import emcee
 import numpy as np
 import matplotlib.pyplot as plt
 from corner import corner
-from cosmo_without_pool import tofit
+from utils.cosmo_without_pool import tofit
 from multiprocessing import Pool
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
