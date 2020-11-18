@@ -113,7 +113,7 @@ pos0 = [0.4, 1.75, -0.07, 0.165, 3.028]
 
 ndim = len(pos0)
 nwalkers = 2*ndim
-nsteps = 3000
+nsteps = 30
 ncut = int(0.1*nsteps)
 
 pos = [pos0 + np.random.randn(ndim)*0.005*pos0 for i in range(nwalkers)]
@@ -138,7 +138,9 @@ corner(samples, labels=labels, plot_datapoints=False, color='C0', title='$\Lambd
 om, M, dM, alpha, beta = np.median(samples, axis=0)
 w = -1
 z_bin = np.linspace(0.01, 1.5, 1000)
-model = tofit(z_bin, om, w)
+model = tofit(z_bin, om, w, in_c)
+model_eds = tofit(z_bin, 1, -1, in_c)
+model_at_z = tofit(z, om, w, in_c)
 mu = mb + alpha*x1 - beta*c - M
 mu[mstar > 10] -= dM
 e_mu = np.sqrt(e_mb**2 + (abs(alpha)*e_x1)**2 + (abs(beta)*e_c)**2)
@@ -154,7 +156,7 @@ line2 = ax1.errorbar(z[sets == 2], mu[sets == 2], e_mu[sets == 2], fmt='.', c=co
 line3 = ax1.errorbar(z[sets == 1], mu[sets == 1], e_mu[sets == 1], fmt='.', c=colors[2], label='SNLS', elinewidth=0.5, ms=2)
 line4 = ax1.errorbar(z[sets == 4], mu[sets == 4], e_mu[sets == 4], fmt='.', c=colors[3], label='HST', elinewidth=0.5, ms=2)
 line5, = ax1.plot(z_bin, model, c='C0', label=r'$\mu_\mathrm{\Lambda CDM}$ (Best fit)', linewidth=1)
-line6, = ax1.plot(z_bin, tofit(z_bin, 1, -1), c='C1', label=r'$\mu_{\mathrm{EdS}}$', linewidth=1)
+line6, = ax1.plot(z_bin, model_eds, c='C1', label=r'$\mu_{\mathrm{EdS}}$', linewidth=1)
 ax1.axes.get_xaxis().set_visible(False)
 ax1.set_ylabel('$\mu$', fontsize=15)
 legend1 = ax1.legend(handles=[line1, line2, line3, line4], frameon=False, loc=2, fontsize=12)
@@ -163,11 +165,11 @@ legend2 = ax1.legend(handles=[line5, line6], frameon=False, loc=4, fontsize=12)
 ax1.set_xscale('log')
 ax2 = fig.add_subplot(gs[-1, :], sharex=ax1)
 ax2.axhline(linestyle='--', c='C0', linewidth=1)
-ax2.errorbar(z[sets == 3], (mu - tofit(z, om, w))[sets == 3], e_mu[sets == 3], fmt='.', c=colors[0], elinewidth=0.5, ms=2)
-ax2.errorbar(z[sets == 2], (mu - tofit(z, om, w))[sets == 2], e_mu[sets == 2], fmt='.', c=colors[1], elinewidth=0.5, ms=2)
-ax2.errorbar(z[sets == 1], (mu - tofit(z, om, w))[sets == 1], e_mu[sets == 1], fmt='.', c=colors[2], elinewidth=0.5, ms=2)
-ax2.errorbar(z[sets == 4], (mu - tofit(z, om, w))[sets == 4], e_mu[sets == 4], fmt='.', c=colors[3], elinewidth=0.5, ms=2)
-ax2.plot(z_bin, tofit(z_bin, 1, -1) - model, c='C1', linewidth=1)
+ax2.errorbar(z[sets == 3], (mu - model_at_z)[sets == 3], e_mu[sets == 3], fmt='.', c=colors[0], elinewidth=0.5, ms=2)
+ax2.errorbar(z[sets == 2], (mu - model_at_z)[sets == 2], e_mu[sets == 2], fmt='.', c=colors[1], elinewidth=0.5, ms=2)
+ax2.errorbar(z[sets == 1], (mu - model_at_z)[sets == 1], e_mu[sets == 1], fmt='.', c=colors[2], elinewidth=0.5, ms=2)
+ax2.errorbar(z[sets == 4], (mu - model_at_z)[sets == 4], e_mu[sets == 4], fmt='.', c=colors[3], elinewidth=0.5, ms=2)
+ax2.plot(z_bin, model_eds - model, c='C1', linewidth=1)
 ax2.set_ylim(-1.1, 1.1)
 ax2.set_xlabel('$z$', fontsize=15)
 ax2.set_ylabel('$\mu-\mu_\mathrm{\Lambda CDM}$', fontsize=15)
@@ -176,11 +178,12 @@ plt.subplots_adjust(hspace=0)
 mask = (e_mstar < 1) & (mstar > 7) & (e_mu < 0.3)
 bins = np.linspace(mstar[mask].min(), mstar[mask].max(), 10)
 digitized = np.digitize(mstar[mask], bins)
-bin_means = [(mu - tofit(z, om, w))[mask][digitized == i].mean() for i in range(1, len(bins))]
-bin_errors = [np.std((mu - tofit(z, om, w))[mask][digitized == i]) for i in range(1, len(bins))]
+bin_means = [(mu - model_at_z)[mask][digitized == i].mean() for i in range(1, len(bins))]
+bin_errors = [np.std((mu - model_at_z)[mask][digitized == i]) for i in range(1, len(bins))]
 plt.figure()
-plt.errorbar(mstar[mask], (mu - tofit(z, om, w))[mask], xerr=e_mstar[mask], yerr=e_mu[mask], fmt='.', ms=2, elinewidth=0.5)
+plt.errorbar(mstar[mask], (mu - model_at_z)[mask], xerr=e_mstar[mask], yerr=e_mu[mask], fmt='.', ms=2, elinewidth=0.5, alpha=0.2)
 plt.errorbar(0.5*(bins[:-1] + bins[1:]), bin_means, bin_errors, fmt='.')
+plt.axhline(linestyle='--', c='C0', linewidth=1)
 plt.xlabel('$\mathrm{log}_{10} ( {M_\star}_\mathrm{ZPEG} / M_\odot)$', fontsize=15)
 plt.ylabel('$\mu-\mu_\mathrm{\Lambda CDM}$', fontsize=15)
 
