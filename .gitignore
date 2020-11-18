@@ -1,5 +1,7 @@
 .cache/
 .coverage
+*.dylib
+*.so
 *.py[co]
 *~
 */*~
