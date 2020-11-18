@@ -9,6 +9,47 @@ import platform
 #os.system('gcc -shared -o testlib.so -lm -fPIC testlib.c')
 
 if platform.uname()[0] != 'Darwin':
+    ending = '.so'
+else:
+    ending = '.dylib'
+
+try:
+    dir1 = os.path.abspath('testlib{}'.format(ending))
+    lib = ctypes.cdll.LoadLibrary(dir1)
+    integrand_in_c = lib.f
+    integrand_in_c.restype = ctypes.c_double
+    integrand_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
+
+    dir2 = os.path.abspath('testlib_total{}'.format(ending))
+    lib2 = ctypes.cdll.LoadLibrary(dir2)
+    integrand_total_in_c = lib2.f
+    integrand_total_in_c.restype = ctypes.c_double
+    integrand_total_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
+except:
+    print('C libraries not compiled')
+    print('Compiling C libraries...')
+    if platform.uname()[0] != 'Darwin':
+        os.system('gcc -shared -o testlib.so -lm -fPIC testlib.c')
+        os.system('gcc -shared -o testlib_total.so -lm -fPIC testlib_total.c')
+    else:
+        os.system('gcc -dynamiclib -o testlib.dylib -lm -fPIC testlib.c')
+        os.system('gcc -dynamiclib -o testlib_total.dylib -lm -fPIC testlib_total.c')
+
+    print('Done')
+    dir1 = os.path.abspath('testlib{}'.format(ending))
+    lib = ctypes.cdll.LoadLibrary(dir1)
+    integrand_in_c = lib.f
+    integrand_in_c.restype = ctypes.c_double
+    integrand_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
+
+    dir2 = os.path.abspath('testlib_total{}'.format(ending))
+    lib2 = ctypes.cdll.LoadLibrary(dir2)
+    integrand_total_in_c = lib2.f
+    integrand_total_in_c.restype = ctypes.c_double
+    integrand_total_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
+
+'''
+if platform.uname()[0] != 'Darwin':
     dir1 = os.path.abspath('testlib.so')
     lib = ctypes.cdll.LoadLibrary(dir1)
     integrand_in_c = lib.f
@@ -32,6 +73,7 @@ else:
     integrand_total_in_c = lib2.f
     integrand_total_in_c.restype = ctypes.c_double
     integrand_total_in_c.argtypes = (ctypes.c_int, ctypes.c_double)
+'''
 
 def ez(z, om, ol, ok, w):
     return (om*(1+z)**3 + ok*(1+z)**2 + ol*(1+z)**(3*(1+w)))**(1/2.)
