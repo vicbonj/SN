@@ -49,7 +49,7 @@ data = 'JLA'
 #data = 'JLA+A2'
 
 if data == 'Pantheon':
-    a = np.genfromtxt('pantheon.txt', names=True, dtype=None)
+    a = np.genfromtxt('data/pantheon.txt', names=True, dtype=None)
     mask = a['zSN'] > -999
     a_masked = a[mask]
     mb = a_masked['mB']
@@ -65,7 +65,7 @@ elif data == 'JLA':
     sigma = np.loadtxt('covmat/sigma_mu.txt')
     #C_eta = sum([fits.getdata(mat) for mat in [g for g in glob('covmat/C*.fits') if 'host' not in g]])
     C_eta = sum([fits.getdata(mat) for mat in [g for g in glob('covmat/C*.fits')]])
-    a = fits.getdata('JLA.fit')
+    a = fits.getdata('data/JLA.fit')
     mb = a['mB']
     e_mb = a['e_mB']
     z = a['zcmb']
@@ -80,20 +80,20 @@ elif data == 'JLA':
     e_lens = 0.055*z
     e_coh = sigma[:,0]
     to_add = e_coh**2 + e_lens**2 + e_pecvel**2
-    cov = np.zeros((len(a), 3, 3))
-    cov[:,0,0] = e_mb**2
-    cov[:,1,1] = e_x1**2
-    cov[:,2,2] = e_c**2
-    cov[:,0,1] = a['cov_mb_s_']
-    cov[:,1,0] = a['cov_mb_s_']
-    cov[:,0,2] = a['cov_mb_c_']
-    cov[:,2,0] = a['cov_mb_c_']
-    cov[:,2,1] = a['cov_s_c_']
-    cov[:,1,2] = a['cov_s_c_'] 
+    #cov = np.zeros((len(a), 3, 3))
+    #cov[:,0,0] = e_mb**2
+    #cov[:,1,1] = e_x1**2
+    #cov[:,2,2] = e_c**2
+    #cov[:,0,1] = a['cov_mb_s_']
+    #cov[:,1,0] = a['cov_mb_s_']
+    #cov[:,0,2] = a['cov_mb_c_']
+    #cov[:,2,0] = a['cov_mb_c_']
+    #cov[:,2,1] = a['cov_s_c_']
+    #cov[:,1,2] = a['cov_s_c_'] 
 elif data == 'JLA+A2':
-    a = fits.getdata('JLA.fit')
+    a = fits.getdata('data/JLA.fit')
     a = a[a['set'] != 3]
-    b = pd.read_csv('A2.dat', sep=' ')
+    b = pd.read_csv('data/A2.dat', sep=' ')
     b = b[b['mB'] > 0]
     sets = np.concatenate([a['set'], np.ones(len(b))*3])
     mb = np.concatenate([a['mB'], b['mB']])
