@@ -122,11 +122,11 @@ pos = [pos0 + np.random.randn(ndim)*0.005*pos0 for i in range(nwalkers)]
 n_cpus_available = os.cpu_count()
 if n_cpus_available <= 8:
     n_cpus = n_cpus_available
-    print("I'm assuming you are working on your laptop, I assigned all available CPUs, that is: {}".format(n_cpus_available))
+    print("I'm assuming you are working on your laptop, I assigned all available CPUs, that is: {}".format(n_cpus))
 else:
     n_cpus = int(3/4.*n_cpus_available)
-    print("I'm assuming you are connected to a big cluster, I assigned 75% of available CPUs, that is: {}".format(n_cpus_available))
-    
+    print("I'm assuming you are connected to a big cluster, I assigned 75% of available CPUs, that is: {}".format(n_cpus))
+
 the_pool = Pool(n_cpus)
 
 sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, pool=the_pool)
