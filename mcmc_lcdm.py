@@ -119,8 +119,8 @@ pos0 = [0.4, 1.75, -0.07, 0.165, 3.028]
 
 ndim = len(pos0)
 nwalkers = 2*ndim
-nsteps = 3000
-ncut = int(0.1*nsteps)
+nsteps = 5000
+ncut = int(0.3*nsteps)
 
 pos = [pos0 + np.random.randn(ndim)*0.005*pos0 for i in range(nwalkers)]
 
